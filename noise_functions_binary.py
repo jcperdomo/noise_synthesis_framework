@@ -88,10 +88,7 @@ def grad_desc_binary(distribution, models, x, y, alpha, learning_rate=.001, T=30
             v = v / norm * alpha
     return v
 
-#
-# FUNCTION_DICT_BINARY = {"randomAscent": randomCoordinateAscent,
-#                         "greedyAscent": greedyCoordinateAscent,
-#                         "oracle": distributional_oracle_binary,
-#                         "gradientDescent": grad_desc_binary}
+
+FUNCTION_DICT_BINARY = {"oracle": distributional_oracle_binary, "gradientDescent": grad_desc_binary}
 
 

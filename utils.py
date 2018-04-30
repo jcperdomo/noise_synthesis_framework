@@ -4,9 +4,7 @@ import sys
 
 
 def get_max(lst, target):
-    """
-    returns maximum of the list (ix, elt); omits target entry
-    """
+    # returns maximum of the list (ix, elt); omits target entry
     n1 = (-sys.maxint, None)
     for ix, elt in enumerate(lst):
         if ix == target:

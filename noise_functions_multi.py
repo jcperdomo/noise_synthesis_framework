@@ -7,6 +7,7 @@ import time
 import ray
 
 
+#TODO: add remote decorator to this, make the oracle parallel!
 def try_region_multi(models, labels, x, delta=1e-10):
     P = matrix(np.identity(x.shape[0]))
     q = matrix(np.zeros(x.shape[0]))
@@ -160,10 +161,8 @@ def grad_desc_nonconvex(distribution, models, x, y, alpha, learning_rate=.001, i
 
     return best_sol[1]
 
-# =
-# FUNCTION_DICT_MULTI = {"randomAscent": randomCoordinateAscentMulti,
-#                        #  "greedyAscent": greedyCoordinateAscentMulti,
-#                        "oracle": distributional_oracle_multi,
-#                        "gradientDescent": grad_desc_convex,
-#                        "gradientNonConvex": grad_desc_nonconvex}
+
+FUNCTION_DICT_MULTI = {"oracle": distributional_oracle_multi,
+                       "grad_desc_convex": grad_desc_convex,
+                       "grad_desc_nonconvex": grad_desc_nonconvex}
 

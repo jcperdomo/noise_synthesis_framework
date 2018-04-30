@@ -1,13 +1,14 @@
 import numpy as np
 import time
 import logging as log
+import ray
 
 
-def evaluateCosts(models, V, X, Y, targets, dl=False):
+def evaluate_costs(models, V, X, Y, targets, dl=False):
     """
     Returns the 0-1 loss of the models on input (X + V, Y) if targets is False
-    Else returns the target accuracy of the models on (X + V, Targetes)
-    dl is a bool to indicate whether the models are linear classifiers or deep learning models
+    Else returns the target accuracy of the models on (X + V, Targets)
+    dl is a bool to indicate whether the models are linear classifiers or keras deep learning models
     """
     if targets is not False:
         if dl:
@@ -22,31 +23,35 @@ def evaluateCosts(models, V, X, Y, targets, dl=False):
     return res
 
 
-def adversary(distribution, models, X, Y, alpha, noiseFunc, targets):
+def adversary(distribution, models, X, Y, alpha, noise_func, targets):
     """
     uses the noise function to compute adversarial perturbations that maximize the loss of the learner under
     the chosen distribution
     """
     if targets is not False:
-        res = np.array([noiseFunc(distribution, models, x, y, alpha, target=target) for x, y, target
-                        in zip(X, Y, targets)])
+        res = [noise_func.remote(distribution, models, x, y, alpha, target=target) for x, y, target
+                        in zip(X, Y, targets)]
     else:
-        res = np.array([noiseFunc(distribution, models, x, y, alpha) for x, y in zip(X, Y)])
-    return res
+        res = [noise_func.remote(distribution, models, x, y, alpha) for x, y in zip(X, Y)]
+    res = ray.get(res)
+    return np.array(res)
 
 
-def runMWU(models, T, X, Y, alpha, noiseFunc, exp_dir, epsilon=None, targeted=False, dl=False):
+def run_mwu(models, iters, X, Y, alpha, noise_func, epsilon=None, targeted=False, dl=False):
+
+    ray.init()
+
     num_models = len(models)
-    # compute epsilon as a function of the number of rounds, see MWU proof for more detail
+
+    # compute epsilon as a function of the number of rounds, see paper for more details
     if epsilon is None:
-        delta = np.sqrt(4 * np.log(num_models) / float(T))
+        delta = np.sqrt(4 * np.log(num_models) / float(iters))
         epsilon = delta / 2.0
     else:
         delta = 2.0 * epsilon
 
-    print("\nRunning MWU for {} Iterations with Epsilon {}\n".format(T, epsilon))
-
-    print("Guaranteed to be within {} of the minimax value \n".format(delta))
+    log.info("\nRunning MWU for {} Iterations with Epsilon {}\n".format(iters, epsilon))
+    log.info("Guaranteed to be within {} of the minimax value \n".format(delta))
 
     loss_history = []
     costs = []
@@ -57,22 +62,16 @@ def runMWU(models, T, X, Y, alpha, noiseFunc, exp_dir, epsilon=None, targeted=Fa
 
     w.append(np.ones(num_models) / num_models)
 
-    for t in xrange(T):
-        print("Iteration {}\n".format(t))
+    for t in xrange(iters):
 
-        if t % (T * .10) == 0 and t > 0:
-            np.save(exp_dir + "/" + "weights_{}.npy".format(t), w)
-            np.save(exp_dir + "/" + "noise_{}.npy".format(t), v)
-            np.save(exp_dir + "/" + "loss_history_{}.npy".format(t), loss_history)
-            np.save(exp_dir + "/" + "acc_history_{}.npy".format(t), acc_history)
-            np.save(a + "/" + "action_loss_{}.npy".format(t), action_loss)
+        log.debug("Iteration {}\n".format(t))
 
         start_time = time.time()
 
-        v_t = adversary(w[t], models, X, Y, alpha, noiseFunc, targeted)
+        v_t = adversary(w[t], models, X, Y, alpha, noise_func, targeted)
         v.append(v_t)
 
-        cost_t = evaluateCosts(models, v_t, X, Y, targeted, dl=dl)
+        cost_t = evaluate_costs(models, v_t, X, Y, targeted, dl=dl)
         costs.append(cost_t)
 
         if targeted is not False:
@@ -87,24 +86,24 @@ def runMWU(models, T, X, Y, alpha, noiseFunc, exp_dir, epsilon=None, targeted=Fa
         loss = np.dot(w[t], cost_t)
         individual = [w[t][j] * cost_t[j] for j in xrange(num_models)]
 
-        print("Weights {} Sum of Weights {}".format(w[t], sum(w[t])))
+        log.debug("Weights {} Sum of Weights {}".format(w[t], sum(w[t])))
 
         if targeted is not False:
-            print("Minimum (Average) Loss of Classifier {}".format(acc_history[-1]))
+            log.debug("Minimum (Average) Loss of Classifier {}".format(acc_history[-1]))
             if dl:
-                print("Cost (Before Noise) {}".format(np.array([model.evaluate(X, targeted)[1] for model in models])))
+                log.debug("Cost (Before Noise) {}".format(np.array([model.evaluate(X, targeted)[1] for model in models])))
             else:
-                print("Cost (Before Noise) {}".format(np.array([model.evaluate(X, targeted) for model in models])))
+                log.debug("Cost (Before Noise) {}".format(np.array([model.evaluate(X, targeted) for model in models])))
 
         else:
-            print("Maximum (Average) Accuracy of Classifier {}".format(acc_history[-1]))
+            log.debug("Maximum (Average) Accuracy of Classifier {}".format(acc_history[-1]))
             if dl:
-                print("Cost (Before Noise) {}".format(np.array([1 - model.evaluate(X, Y)[1] for model in models])))
+                log.debug("Cost (Before Noise) {}".format(np.array([1 - model.evaluate(X, Y)[1] for model in models])))
             else:
-                print("Cost (Before Noise) {}".format(np.array([1 - model.evaluate(X, Y) for model in models])))
+                log.debug("Cost (Before Noise) {}".format(np.array([1 - model.evaluate(X, Y) for model in models])))
 
-        print("Cost (After Noise), {}".format(cost_t))
-        print("Loss {} Loss Per Action {}".format(loss, individual))
+        log.debug("Cost (After Noise), {}".format(cost_t))
+        log.debug("Loss {} Loss Per Action {}".format(loss, individual))
 
         loss_history.append(loss)
         action_loss.append(individual)
@@ -123,6 +122,6 @@ def runMWU(models, T, X, Y, alpha, noiseFunc, exp_dir, epsilon=None, targeted=Fa
 
         w.append(new_w)
 
-        print("time spent {}\n".format(time.time() - start_time))
-    print("finished running MWU ")
+        log.debug("time spent {}\n".format(time.time() - start_time))
+    log.info("finished running MWU ")
     return w, v, loss_history, acc_history, action_loss
