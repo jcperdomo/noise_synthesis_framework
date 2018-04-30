@@ -44,9 +44,9 @@ def runMWU(models, T, X, Y, alpha, noiseFunc, exp_dir, epsilon=None, targeted=Fa
     else:
         delta = 2.0 * epsilon
 
-    log.debug("\nRunning MWU for {} Iterations with Epsilon {}\n".format(T, epsilon))
+    print("\nRunning MWU for {} Iterations with Epsilon {}\n".format(T, epsilon))
 
-    log.debug("Guaranteed to be within {} of the minimax value \n".format(delta))
+    print("Guaranteed to be within {} of the minimax value \n".format(delta))
 
     loss_history = []
     costs = []
@@ -58,14 +58,14 @@ def runMWU(models, T, X, Y, alpha, noiseFunc, exp_dir, epsilon=None, targeted=Fa
     w.append(np.ones(num_models) / num_models)
 
     for t in xrange(T):
-        log.debug("Iteration {}\n".format(t))
+        print("Iteration {}\n".format(t))
 
         if t % (T * .10) == 0 and t > 0:
             np.save(exp_dir + "/" + "weights_{}.npy".format(t), w)
             np.save(exp_dir + "/" + "noise_{}.npy".format(t), v)
             np.save(exp_dir + "/" + "loss_history_{}.npy".format(t), loss_history)
             np.save(exp_dir + "/" + "acc_history_{}.npy".format(t), acc_history)
-            np.save(exp_dir + "/" + "action_loss_{}.npy".format(t), action_loss)
+            np.save(a + "/" + "action_loss_{}.npy".format(t), action_loss)
 
         start_time = time.time()
 
@@ -87,24 +87,24 @@ def runMWU(models, T, X, Y, alpha, noiseFunc, exp_dir, epsilon=None, targeted=Fa
         loss = np.dot(w[t], cost_t)
         individual = [w[t][j] * cost_t[j] for j in xrange(num_models)]
 
-        log.debug("Weights {} Sum of Weights {}".format(w[t], sum(w[t])))
+        print("Weights {} Sum of Weights {}".format(w[t], sum(w[t])))
 
         if targeted is not False:
-            log.debug("Minimum (Average) Loss of Classifier {}".format(acc_history[-1]))
+            print("Minimum (Average) Loss of Classifier {}".format(acc_history[-1]))
             if dl:
-                log.debug("Cost (Before Noise) {}".format(np.array([model.evaluate(X, targeted)[1] for model in models])))
+                print("Cost (Before Noise) {}".format(np.array([model.evaluate(X, targeted)[1] for model in models])))
             else:
-                log.debug("Cost (Before Noise) {}".format(np.array([model.evaluate(X, targeted) for model in models])))
+                print("Cost (Before Noise) {}".format(np.array([model.evaluate(X, targeted) for model in models])))
 
         else:
-            log.debug("Maximum (Average) Accuracy of Classifier {}".format(acc_history[-1]))
+            print("Maximum (Average) Accuracy of Classifier {}".format(acc_history[-1]))
             if dl:
-                log.debug("Cost (Before Noise) {}".format(np.array([1 - model.evaluate(X, Y)[1] for model in models])))
+                print("Cost (Before Noise) {}".format(np.array([1 - model.evaluate(X, Y)[1] for model in models])))
             else:
-                log.debug("Cost (Before Noise) {}".format(np.array([1 - model.evaluate(X, Y) for model in models])))
+                print("Cost (Before Noise) {}".format(np.array([1 - model.evaluate(X, Y) for model in models])))
 
-        log.debug("Cost (After Noise), {}".format(cost_t))
-        log.debug("Loss {} Loss Per Action {}".format(loss, individual))
+        print("Cost (After Noise), {}".format(cost_t))
+        print("Loss {} Loss Per Action {}".format(loss, individual))
 
         loss_history.append(loss)
         action_loss.append(individual)
@@ -123,6 +123,6 @@ def runMWU(models, T, X, Y, alpha, noiseFunc, exp_dir, epsilon=None, targeted=Fa
 
         w.append(new_w)
 
-        log.debug("time spent {}\n".format(time.time() - start_time))
-    log.debug("finished running MWU ")
+        print("time spent {}\n".format(time.time() - start_time))
+    print("finished running MWU ")
     return w, v, loss_history, acc_history, action_loss
