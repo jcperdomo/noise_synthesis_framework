@@ -10,9 +10,9 @@
 
 EXP_TYPE="multi"
 NOISE_TYPE="untargeted"
-NOISE_FUNC="grad_desc_nonconvex"
+NOISE_FUNC="grad_desc_convex"
 NUM_CLASSIFIERS=5
-ITERS=1
+ITERS=50
 ALPHA=.5
 LOG_LEVEL="DEBUG"
 MODEL_PATH='linear_models/multi'

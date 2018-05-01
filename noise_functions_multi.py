@@ -71,7 +71,7 @@ def distributional_oracle_multi(distribution, models, x, y, alpha, target=False)
 
 @ray.remote
 def grad_desc_targeted(distribution, models, x, target, alpha, learning_rate=.001,
-                       iters=3000, early_stop=5, box_min=-.5, box_max=.5):
+                       iters=3000, early_stop=5, box_min=0.0, box_max=1.0):
     v = np.zeros(len(x))
     best_sol = (sys.maxint, v)
     loss_queue = []
@@ -108,26 +108,27 @@ def grad_desc_targeted(distribution, models, x, target, alpha, learning_rate=.00
 
 @ray.remote
 def grad_desc_convex(distribution, models, x, y, alpha, target=False, learning_rate=.001, iters=3000, early_stop=5,
-                     box_min=-.5, box_max=.5):
+                     box_min=0.0, box_max=1.0):
     if target:
         return grad_desc_targeted(distribution, models, x, target, alpha, learning_rate, iters, early_stop, box_min,
                                   box_max)[1]
     else:
-        targets = range(10)
-        del targets[y]
+        other_labels = range(10)
+        del other_labels[y]
         noise_options = []
-        for target in targets:
-            sol = grad_desc_targeted(distribution, models, x, target, alpha, learning_rate, iters, early_stop,
-                                     box_min, box_max)
+        for label in other_labels:
+            sol = grad_desc_targeted.remote(distribution, models, x, label, alpha, learning_rate, iters, early_stop,
+                                            box_min, box_max)
+            sol = ray.get(sol)
             noise_options.append(sol)
             if sol[0] == 0:
                 return sol[1]
-        return min(noise_options, key=lambda x: x[0])[1]
+        return min(noise_options, key=lambda v: v[0])[1]
 
 
 @ray.remote
 def grad_desc_nonconvex(distribution, models, x, y, alpha, learning_rate=.001, iters=3000, early_stop=5,
-                        box_min=-.5, box_max=.5):
+                        box_min=0.0, box_max=1.0):
     v = np.zeros(len(x))
     best_sol = (sys.maxint, v)
     loss_queue = []
