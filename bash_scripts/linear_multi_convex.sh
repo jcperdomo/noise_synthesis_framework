@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-#SBATCH -t 1-0:00
+#SBATCH -t 0-10:00
 #SBATCH -p general
 #SBATCH -N 1
 #SBATCH -n 64
