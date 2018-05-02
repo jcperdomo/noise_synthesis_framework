@@ -69,7 +69,7 @@ def distributional_oracle_multi(distribution, models, x, y, alpha, target=False)
     return np.zeros(x.shape[0])  # we can't trick anything
 
 
-@ray.remote
+# @ray.remote
 def grad_desc_targeted(distribution, models, x, target, alpha, learning_rate=.001,
                        iters=3000, early_stop=5, box_min=0.0, box_max=1.0):
     v = np.zeros(len(x))
@@ -117,9 +117,8 @@ def grad_desc_convex(distribution, models, x, y, alpha, target=False, learning_r
         del other_labels[y]
         best_sol = (sys.maxint, None)
         for label in other_labels:
-            sol = grad_desc_targeted.remote(distribution, models, x, label, alpha, learning_rate, iters, early_stop,
-                                            box_min, box_max)
-            sol = ray.get(sol)
+            sol = grad_desc_targeted(distribution, models, x, label, alpha, learning_rate, iters, early_stop,
+                                     box_min, box_max)
             if sol[0] < best_sol[0]:
                 best_sol = sol
             if best_sol[0] == 0.0:
