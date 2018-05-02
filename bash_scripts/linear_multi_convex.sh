@@ -4,7 +4,7 @@
 #SBATCH -p general
 #SBATCH -N 1
 #SBATCH -n 64
-#SBATCH --mem=120000
+#SBATCH --mem=100000
 #SBATCH --mail-type=all
 #SBATCH --mail-user=jperdomo@college.harvard.edu
 
