@@ -80,14 +80,14 @@ def grad_desc_targeted(distribution, models, x, target, alpha, learning_rate=.00
                         for p, model in zip(distribution, models)])[0]
 
         v += learning_rate * gradient
-        norm = np.linalg.norm(v)
-
-        if norm >= alpha:
-            v = v / norm * alpha
 
         # clip values so they lie in the appropriate range
         curr_sol = np.clip(x + v, box_min, box_max)
         v = curr_sol - x
+
+        norm = np.linalg.norm(v)
+        if norm >= alpha:
+            v = v / norm * alpha
 
         loss = np.dot(distribution, [model.rhinge_loss([x + v], [target])[0] for model in models])
         loss_queue = [loss] + loss_queue
@@ -115,15 +115,16 @@ def grad_desc_convex(distribution, models, x, y, alpha, target=False, learning_r
     else:
         other_labels = range(10)
         del other_labels[y]
-        noise_options = []
+        best_sol = (sys.maxint, None)
         for label in other_labels:
             sol = grad_desc_targeted.remote(distribution, models, x, label, alpha, learning_rate, iters, early_stop,
                                             box_min, box_max)
             sol = ray.get(sol)
-            noise_options.append(sol)
-            if sol[0] == 0:
-                return sol[1]
-        return min(noise_options, key=lambda v: v[0])[1]
+            if sol[0] < best_sol[0]:
+                best_sol = sol
+            if best_sol[0] == 0.0:
+                return best_sol[1]
+        return best_sol[1]
 
 
 @ray.remote
@@ -137,13 +138,13 @@ def grad_desc_nonconvex(distribution, models, x, y, alpha, learning_rate=.001, i
                         for p, model in zip(distribution, models)])[0]
         v += learning_rate * gradient
 
-        norm = np.linalg.norm(v)
-        if norm >= alpha:
-            v = v / norm * alpha
-
         # clip values so they lie in the appropriate range
         curr_sol = np.clip(x + v, box_min, box_max)
         v = curr_sol - x
+
+        norm = np.linalg.norm(v)
+        if norm >= alpha:
+            v = v / norm * alpha
 
         loss = np.dot(distribution, [model.untargeted_loss(np.array([x + v]), [y])[0] for model in models])
 
@@ -159,7 +160,6 @@ def grad_desc_nonconvex(distribution, models, x, y, alpha, learning_rate=.001, i
 
         if loss == 0:
             break
-
     return best_sol[1]
 
 
