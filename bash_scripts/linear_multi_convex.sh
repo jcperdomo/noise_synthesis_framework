@@ -13,11 +13,11 @@ NOISE_TYPE="untargeted"
 NOISE_FUNC="grad_desc_convex"
 NUM_CLASSIFIERS=5
 ITERS=50
-ALPHA=.5
+ALPHA=.1
 LOG_LEVEL="DEBUG"
 MODEL_PATH='linear_models/multi'
 DATA_PATH="linear_experiments_data/multi"
-PURPOSE='cluster_run_2'
+PURPOSE='cluster_run_3'
 
 CMD="python -m linear_experiments -exp_type $EXP_TYPE -noise_type $NOISE_TYPE -noise_func $NOISE_FUNC
     -num_classifiers $NUM_CLASSIFIERS -iters $ITERS -alpha $ALPHA -log_level $LOG_LEVEL -model_path $MODEL_PATH
