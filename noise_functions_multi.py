@@ -69,7 +69,6 @@ def distributional_oracle_multi(distribution, models, x, y, alpha, target=False)
     return np.zeros(x.shape[0])  # we can't trick anything
 
 
-# @ray.remote
 def grad_desc_targeted(distribution, models, x, target, alpha, learning_rate=.001,
                        iters=3000, early_stop=5, box_min=0.0, box_max=1.0):
     v = np.zeros(len(x))

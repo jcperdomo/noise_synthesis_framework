@@ -75,10 +75,10 @@ def subset_binary_data(data, labels, label_dict):
     X = []
     Y = []
     for i in xrange(len(data)):
-        label = np.argmax(labels[i])
+        label = labels[i]
         if label in subset:
             label = label_dict[label]
-            X.append(data[i].reshape(-1,))
+            X.append(data[i])
             Y.append(label)
     return np.array(X), np.array(Y)
 

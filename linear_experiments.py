@@ -17,7 +17,7 @@ def main(arguments):
     parser.add_argument("-noise_type", help="targeted or untargeted noise", choices=["targeted", "untargeted"],
                         default="untargeted", type=str)
     parser.add_argument("-noise_func", help="noise function used for the adversary",
-                        choices=["oracle", "grad_desc_convex", "grad_desc_nonconvex"],
+                        choices=["oracle", "grad_desc_convex", "grad_desc_nonconvex", 'grad_desc'],
                         required=True)
     parser.add_argument("-num_classifiers", help='number of classifiers', type=int, required=True)
     parser.add_argument("-iters", help="number of iterations for the MWU", type=int, required=True)

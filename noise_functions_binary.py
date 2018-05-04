@@ -2,6 +2,7 @@ from functools import partial
 from cvxopt import matrix, solvers
 from itertools import product
 import numpy as np
+import ray
 
 
 def try_region_binary(models, signs, x, delta=1e-10):
@@ -38,6 +39,7 @@ def try_region_binary(models, signs, x, delta=1e-10):
         return None
 
 
+@ray.remote
 def distributional_oracle_binary(distribution, models, x, y, alpha):
     """
     computes the optimal perturbation for x under alpha and the given distribution
@@ -74,21 +76,29 @@ def distributional_oracle_binary(distribution, models, x, y, alpha):
             return min(feasible_candidates, key=lambda x: x[1])[0]
 
 
-def grad_desc_binary(distribution, models, x, y, alpha, learning_rate=.001, T=3000):
+@ray.remote
+def grad_desc_binary(distribution, models, x, y, alpha, learning_rate=.001, iters=3000, box_min=0.0, box_max=1.0):
     v = np.zeros(len(x))
-    for i in xrange(T):
+    for i in xrange(iters):
+
         loss = np.dot(distribution, [model.rhinge_loss(x + v, y) for model in models])
         if loss == 0:
             break
 
         gradient = sum([-1 * w * model.gradient(x + v, y) for w, model in zip(distribution, models)])[0]
         v += learning_rate * gradient
+
+        # clip values so they lie in the appropriate range
+        curr_sol = np.clip(x + v, box_min, box_max)
+        v = curr_sol - x
+
         norm = np.linalg.norm(v)
         if norm >= alpha:
             v = v / norm * alpha
+
     return v
 
 
-FUNCTION_DICT_BINARY = {"oracle": distributional_oracle_binary, "gradientDescent": grad_desc_binary}
+FUNCTION_DICT_BINARY = {"oracle": distributional_oracle_binary, "grad_desc": grad_desc_binary}
 
 
