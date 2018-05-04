@@ -8,14 +8,14 @@ import ray
 
 
 #TODO: add remote decorator to this, make the oracle parallel!
-def try_region_multi(models, labels, x, delta=1e-10):
+def try_region_multi(models, labels, x, delta=1e-8, num_labels=4):
     P = matrix(np.identity(x.shape[0]))
     q = matrix(np.zeros(x.shape[0]))
     h = []
     G = []
     num_models = len(models)
     for i in xrange(num_models):
-        others = range(10)
+        others = range(num_labels)
         target = labels[i]
         del others[target]
         target_w, target_b = models[i].weights[target], models[i].bias[target]
@@ -35,16 +35,17 @@ def try_region_multi(models, labels, x, delta=1e-10):
         if sum(is_desired_label) == num_models:
             return v
         else:
-            return try_region_multi(models, labels, x, delta * 1.5)
+            return try_region_multi(models, labels, x, delta * 1.5, num_labels)
     else:
         return None
 
 
-def distributional_oracle_multi(distribution, models, x, y, alpha, target=False):
+@ray.remote
+def distributional_oracle_multi(distribution, models, x, y, alpha, num_labels=4, target=False):
     num_models = len(models)
 
     labels_values = []
-    for labels in product(range(10), repeat=num_models):  # iterate over all possible regions
+    for labels in product(range(num_labels), repeat=num_models):  # iterate over all possible regions
         if target:
             is_misclassified = (np.array(labels) == target).astype(np.float32)
         else:
@@ -57,7 +58,7 @@ def distributional_oracle_multi(distribution, models, x, y, alpha, target=False)
     for curr_value in values:
         feasible_candidates = []
         for labels in [labels for labels, val in labels_values if val == curr_value]:
-            v = try_region_multi(models, labels, x)
+            v = try_region_multi(models, labels, x, num_labels=num_labels)
             if v is not None:
                 norm = np.linalg.norm(v)
                 if norm <= alpha:
@@ -106,13 +107,13 @@ def grad_desc_targeted(distribution, models, x, target, alpha, learning_rate=.00
 
 
 @ray.remote
-def grad_desc_convex(distribution, models, x, y, alpha, target=False, learning_rate=.001, iters=3000, early_stop=5,
-                     box_min=0.0, box_max=1.0):
+def grad_desc_convex(distribution, models, x, y, alpha, num_labels=4, target=False, learning_rate=.001, iters=3000,
+                     early_stop=5, box_min=0.0, box_max=1.0):
     if target:
         return grad_desc_targeted(distribution, models, x, target, alpha, learning_rate, iters, early_stop, box_min,
                                   box_max)[1]
     else:
-        other_labels = range(10)
+        other_labels = range(num_labels)
         del other_labels[y]
         best_sol = (sys.maxint, None)
         for label in other_labels:
@@ -132,7 +133,7 @@ def grad_desc_nonconvex(distribution, models, x, y, alpha, learning_rate=.001, i
     best_sol = (sys.maxint, v)
     loss_queue = []
     for i in xrange(iters):
-        gradient = sum([-1 * p * model.gradient_untargeted(np.array([x + v]), [y])
+        gradient = sum([-1.0 * p * model.gradient_untargeted(np.array([x + v]), [y])
                         for p, model in zip(distribution, models)])[0]
         v += learning_rate * gradient
 

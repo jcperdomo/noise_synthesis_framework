@@ -42,7 +42,7 @@ def jointly_shuffle_arrays(a, b, p=None):
     return a[p], b[p], p
 
 
-def generate_exp_data(num_pts, X, Y, models, target_dict=False):
+def generate_exp_data(num_pts, X, Y, models, target_dict=False, num_classes=4):
     # returns num_pts from (X, Y) that are correctly classified by all models
     num_selected = 0
     num_models = len(models)
@@ -56,7 +56,7 @@ def generate_exp_data(num_pts, X, Y, models, target_dict=False):
                 target_labels = target_dict[true_label]
                 for l in target_labels:
                     res_X.append(X[i])
-                    res_Y.append((np.arange(10) == l).astype(np.float32))
+                    res_Y.append((np.arange(num_classes) == l).astype(np.float32))
             else:
                 res_X.append(X[i])
                 res_Y.append(Y[i])
@@ -68,7 +68,7 @@ def generate_exp_data(num_pts, X, Y, models, target_dict=False):
     return np.array(res_X), np.array(res_Y)
 
 
-def subset_binary_data(data, labels, label_dict):
+def subset_multiclass_data(data, labels, label_dict):
     # used for binary classification, subsets data to only include labels in label dict
     # label dict has the form of original label -> new label
     subset = set(label_dict.keys())

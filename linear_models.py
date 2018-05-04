@@ -103,7 +103,7 @@ class LinearOneVsAllClassifier(object):
 
         distances = []
         for i in xrange(n):
-            label_options = range(10)
+            label_options = range(self.num_classes)
             del label_options[Y[i]]
             dists = []
             for j in label_options:
@@ -129,7 +129,7 @@ class LinearOneVsAllClassifier(object):
 
         for i in xrange(n):
             target = targets[i]
-            others = range(10)
+            others = range(self.num_classes)
             del others[target]
 
             if np.argmax(preds[i]) == target:
@@ -168,7 +168,7 @@ class LinearOneVsAllClassifier(object):
 
         for i in xrange(n):
             y = Y[i]
-            others = range(10)
+            others = range(self.num_classes)
             del others[y]
             if np.argmax(preds[i]) != y:
                 res = 0
@@ -189,7 +189,7 @@ class LinearOneVsAllClassifier(object):
 
         for i in xrange(n):
             y = Y[i]
-            others = range(10)
+            others = range(self.num_classes)
             del others[y]
             if np.argmax(preds[i]) != y:
                 res = np.zeros(self.dim)

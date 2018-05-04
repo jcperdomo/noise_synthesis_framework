@@ -1,16 +1,16 @@
 #!/bin/bash
 #
-#SBATCH -t 0-04:00
+#SBATCH -t 1-00:00
 #SBATCH -p general
 #SBATCH -N 1
 #SBATCH -n 64
-#SBATCH --mem=120000
+#SBATCH --mem=100000
 #SBATCH --mail-type=all
 #SBATCH --mail-user=jperdomo@college.harvard.edu
 
 EXP_TYPE="multi"
 NOISE_TYPE="untargeted"
-NOISE_FUNC="grad_desc_nonconvex"
+NOISE_FUNC="oracle"
 NUM_CLASSIFIERS=5
 ITERS=50
 ALPHA=.2

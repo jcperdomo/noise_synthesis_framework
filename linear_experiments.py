@@ -27,6 +27,7 @@ def main(arguments):
     parser.add_argument("-data_path", help="directory with experiment data ", type=str, required=True)
     parser.add_argument("-purpose", help='short string (1 word) to describe purpose of experiment', type=str,
                         required=True)
+    parser.add_argument("-num_classes", help='int, number of classes for multiclass', type=int, required=False)
     args = parser.parse_args(arguments)
 
     date = datetime.datetime.now()
@@ -52,6 +53,7 @@ def main(arguments):
     log.info("Data path {}".format(args.data_path))
     log.info("Model path {}".format(args.model_path))
     log.info("Num Classifiers {}".format(args.num_classifiers))
+    log.info("Num Classes {}".format(args.num_classes))
 
     linear_models = []
     for i in xrange(args.num_classifiers):
@@ -60,7 +62,7 @@ def main(arguments):
         if args.exp_type == "binary":
             model = LinearBinaryClassifier(weights, bias)
         else:
-            model = LinearOneVsAllClassifier(10, weights, bias)
+            model = LinearOneVsAllClassifier(args.num_classes, weights, bias)
         linear_models.append(model)
 
     X_exp = np.load(args.data_path + "/" + "X_exp.npy")

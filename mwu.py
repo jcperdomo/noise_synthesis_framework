@@ -30,7 +30,7 @@ def adversary(distribution, models, X, Y, alpha, noise_func, targets):
     """
     if targets is not False:
         res = [noise_func.remote(distribution, models, x, y, alpha, target=target) for x, y, target
-                        in zip(X, Y, targets)]
+               in zip(X, Y, targets)]
     else:
         res = [noise_func.remote(distribution, models, x, y, alpha) for x, y in zip(X, Y)]
     res = ray.get(res)
