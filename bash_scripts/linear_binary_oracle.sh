@@ -8,9 +8,9 @@
 #SBATCH --mail-type=all
 #SBATCH --mail-user=jperdomo@college.harvard.edu
 
-EXP_TYPE="oracle"
+EXP_TYPE="binary"
 NOISE_TYPE="untargeted"
-NOISE_FUNC="grad_desc"
+NOISE_FUNC="oracle"
 NUM_CLASSIFIERS=5
 ITERS=1
 ALPHA=.35
