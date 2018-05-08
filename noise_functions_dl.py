@@ -33,7 +33,7 @@ class GradientDescentDL:
         learning_rate: learning rate for the Adam optimizer
         max_iterations: int
         """
-        log.debug("Number of models {} ".format(len(models)))
+        print("Number of models {} ".format(len(models)))
         image_size, num_channels, num_labels, box_vals = dataset_params  # imagenet parameters 224, 3, 1000 (0, 255)
         self.sess = sess                                                 # mnist parameters 28, 1, 100 (0,1)
         self.alpha = alpha
@@ -49,7 +49,7 @@ class GradientDescentDL:
         shape = (batch_size, image_size, image_size, num_channels)
         
         # the variable we're going to optimize over
-        self.modifier = tf.Variable(np.zeros(shape, dtype=np.float32))
+        modifier = tf.Variable(np.zeros(shape, dtype=np.float32))
 
         # these are variables to be more efficient in sending data to tf
         self.timg = tf.Variable(np.zeros(shape), dtype=tf.float32)
@@ -62,12 +62,12 @@ class GradientDescentDL:
         self.assign_weights = tf.placeholder(tf.float32, [self.num_models])
 
         # the resulting image, clipped to keep bounded from boxmin to boxmax
-        self.newimg = tf.clip_by_value(self.modifier + self.timg, self.box_min, self.box_max)
+        self.boxmul = (self.box_max - self.box_min) / 2.
+        self.boxplus = (self.box_min + self.box_max) / 2.
+        self.newimg = tf.tanh(modifier + self.timg) * self.boxmul + self.boxplus
+        # self.newimg = tf.clip_by_value(self.modifier + self.timg, self.box_min, self.box_max)
 
         self.outputs = [model(self.newimg) for model in models]
-        
-        # distance to the input data
-        self.norm = tf.norm(self.modifier)
         
         # compute the probability of the label class versus the maximum other
         reals = []
@@ -94,15 +94,18 @@ class GradientDescentDL:
 
         # sum up the losses
         self.loss1 = tf.add_n(self.loss1list)
-        self.loss = self.loss1
-        self.reals = reals
-        self.others = others
+
+        # distance to the input data
+        self.l2dist = tf.reduce_sum(tf.square(self.newimg - self.timg), [1, 2, 3])
+        self.loss2 = tf.maximum(0.0, self.l2dist - self.alpha ** 2)
+
+        self.loss = self.loss1 + self.loss2
 
         # Setup the adam optimizer and keep track of variables we're creating
         start_vars = set(x.name for x in tf.global_variables())
-        adam = tf.train.AdamOptimizer(self.learning_rate)
-        optimizer = VariableClippingOptimizer(adam, {self.modifier: [1, 2, 3]}, self.alpha)
-        self.train = optimizer.minimize(self.loss, var_list=[self.modifier])
+        optimizer = tf.train.AdamOptimizer(self.learning_rate)
+        # optimizer = VariableClippingOptimizer(adam, {self.modifier: [1, 2, 3]}, self.alpha)
+        self.train = optimizer.minimize(self.loss, var_list=[modifier])
 
         end_vars = tf.global_variables()
         new_vars = [x for x in end_vars if x.name not in start_vars]
@@ -113,7 +116,7 @@ class GradientDescentDL:
         self.setup.append(self.tlab.assign(self.assign_tlab))
         self.setup.append(self.weights.assign(self.assign_weights))
 
-        self.init = tf.variables_initializer(var_list=[self.modifier]+new_vars)
+        self.init = tf.variables_initializer(var_list=[modifier] + new_vars)
 
     def attack(self, imgs, targets, weights):
         """
@@ -124,7 +127,7 @@ class GradientDescentDL:
         """
         r = []
         for i in range(0, len(imgs), self.batch_size):
-            r.extend(self.attack_batch(imgs[i:i+self.batch_size], targets[i:i+self.batch_size], weights))
+            r.extend(self.attack_batch(imgs[i :i+self.batch_size], targets[i:i+self.batch_size], weights))
         return np.array(r)
 
     def attack_batch(self, imgs, labs, weights):
@@ -132,20 +135,22 @@ class GradientDescentDL:
         Run the attack on a batch of images and labels.
         """
 
-        batch_size = self.batch_size
+        batch_size = len(imgs)
         best_attack = [np.zeros(imgs[0].shape)] * batch_size
 
         # completely reset adam's internal state.
         self.sess.run(self.init)
-        batch = imgs[:batch_size]
-        batchlab = labs[:batch_size]
+
+        batch = imgs
+        batchlab = labs
 
         best_score = [sys.maxint] * batch_size
 
         # set the variables so that we don't have to send them over again
-        self.sess.run(self.setup, {self.assign_timg: batch,
-                                   self.assign_tlab: batchlab,
+        self.sess.run(self.setup, {self.assign_timg: imgs,
+                                   self.assign_tlab: labs,
                                    self.assign_weights: weights})
+
         # keras dependency
         from keras import backend as K
 
@@ -154,26 +159,27 @@ class GradientDescentDL:
             # perform the attack
             self.sess.run([self.train], feed_dict={K.learning_phase(): 0})
 
-            norm, loss_list, scores, nimg, loss = self.sess.run([self.norm, self.loss1list, self.outputs, self.newimg,
-                                                                 self.loss], feed_dict={K.learning_phase(): 0})
+            loss1list, scores, nimg, loss2, loss = self.sess.run([self.loss1list, self.outputs, self.newimg, self.loss2, self.loss],
+                                                                 feed_dict={K.learning_phase(): 0})
 
-            if iteration == self.max_iterations - 1:
-                log.debug("Iteration {}".format(iteration))
-                log.debug("Time in Iteration {}".format(time.time() - start_time))
-                log.debug("Norm {}".format(norm))
-                log.debug("Loss List {}".format(loss_list))
-                log.debug("Loss {}".format(loss))
+            # if iteration == self.max_iterations - 1:
+            if iteration % 1000 == 0:
+                print("Iteration {}".format(iteration))
+                print("Time in Iteration {}".format(time.time() - start_time))
+                print("Loss1 List {}".format(loss1list))
+                print("Loss2 {}".format(loss2))
+                print("Loss {}".format(loss))
 
             scores = np.array(scores).reshape(self.batch_size, self.num_models, self.num_labels)
 
-            for e, (sc, ii) in enumerate(zip(scores, nimg)):
+            for e, im in enumerate(nimg):
                 if loss < best_score[e]:  # we've found a clear improvement for this attack
                     best_score[e] = loss
                     best_attack[e] = ii
 
         # return the best solution found
-        t_img = self.sess.run([self.timg], feed_dict={K.learning_phase(): 0})[0]
-        return np.array(best_attack) - t_img
+        # t_img = self.sess.run([self.timg], feed_dict={K.learning_phase(): 0})[0]
+        return np.array(best_attack) - batch[0] # used to be t_img
 
 
 def gradientDescentFunc(distribution, models, x, y, alpha, attack=None, target=None):
