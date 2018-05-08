@@ -1,5 +1,4 @@
 import numpy as np
-from sklearn import svm
 from utils import get_max
 from noise_functions_multi import try_region_multi
 
@@ -62,12 +61,6 @@ class LinearBinaryClassifier(object):
 
         res = np.maximum(0, Y.reshape(-1, 1) * (np.matmul(X, self.weights) + self.bias))
         return np.mean(res.reshape(-1, ))
-
-#
-# def trainLBC(X, Y):
-#     model = svm.SVC(kernel="linear")
-#     model.fit(X, Y)
-#     return LinearBinaryClassifier(model.coef_.T, model.intercept_)
 
 
 class LinearOneVsAllClassifier(object):
@@ -200,9 +193,3 @@ class LinearOneVsAllClassifier(object):
                 res = w_y - w_max
             gradient.append(res)
         return np.array(gradient)
-
-
-# def train_LMC(X, Y):
-#     model = svm.LinearSVC(loss='hinge')
-#     model.fit(X, Y)
-#     return LinearOneVsAllClassifier(10, model.coef_, model.intercept_)
