@@ -83,3 +83,19 @@ def subset_multiclass_data(data, labels, label_dict):
     return np.array(X), np.array(Y)
 
 
+def generate_exp_data_dl(num_pts, models, X, Y):
+    num_selected = 0
+    res_X = []
+    res_Y = []
+    print len(X)
+    for i in xrange(len(X)):
+        if sum([model.evaluate(X[i:i + 1], Y[i:i + 1], verbose=0)[1] for model in models]) == len(models):
+            res_X.append(X[i])
+            res_Y.append(Y[i])
+            num_selected += 1
+        if num_selected == num_pts:
+            break
+    if num_selected != num_pts:
+        print "not enough points were classified correctly"
+    return np.array(res_X), np.array(res_Y)
+

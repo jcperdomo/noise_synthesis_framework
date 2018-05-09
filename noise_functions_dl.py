@@ -33,7 +33,7 @@ class GradientDescentDL:
         learning_rate: learning rate for the Adam optimizer
         max_iterations: int
         """
-        print("Number of models {} ".format(len(models)))
+        log.debug("Number of models {} ".format(len(models)))
         image_size, num_channels, num_labels, box_vals = dataset_params  # imagenet parameters 224, 3, 1000 (0, 255)
         self.sess = sess                                                 # mnist parameters 28, 1, 100 (0,1)
         self.alpha = alpha
@@ -72,7 +72,7 @@ class GradientDescentDL:
         # compute the probability of the label class versus the maximum other
         reals = []
         others = []
-        for i in xrange(self.num_models):
+        for i in xrange(self.num_models): # TODO needs to be edited for larger batch sizes
             real = tf.reduce_sum(self.tlab * self.outputs[i], 1)
             other = tf.reduce_max((1 - self.tlab) * self.outputs[i], 1)
             reals.append(real)
@@ -127,7 +127,7 @@ class GradientDescentDL:
         """
         r = []
         for i in range(0, len(imgs), self.batch_size):
-            r.extend(self.attack_batch(imgs[i :i+self.batch_size], targets[i:i+self.batch_size], weights))
+            r.extend(self.attack_batch(imgs[i:i+self.batch_size], targets[i:i+self.batch_size], weights))
         return np.array(r)
 
     def attack_batch(self, imgs, labs, weights):
@@ -141,10 +141,7 @@ class GradientDescentDL:
         # completely reset adam's internal state.
         self.sess.run(self.init)
 
-        batch = imgs
-        batchlab = labs
-
-        best_score = [sys.maxint] * batch_size
+        best_loss = [sys.maxint] * batch_size
 
         # set the variables so that we don't have to send them over again
         self.sess.run(self.setup, {self.assign_timg: imgs,
@@ -159,27 +156,32 @@ class GradientDescentDL:
             # perform the attack
             self.sess.run([self.train], feed_dict={K.learning_phase(): 0})
 
-            loss1list, scores, nimg, loss2, loss = self.sess.run([self.loss1list, self.outputs, self.newimg, self.loss2, self.loss],
-                                                                 feed_dict={K.learning_phase(): 0})
+            nimg, loss1list, loss2, loss = self.sess.run([self.newimg, self.loss1list, self.loss2, self.loss],
+                                                         feed_dict={K.learning_phase(): 0})
 
-            # if iteration == self.max_iterations - 1:
-            if iteration % 1000 == 0:
-                print("Iteration {}".format(iteration))
-                print("Time in Iteration {}".format(time.time() - start_time))
-                print("Loss1 List {}".format(loss1list))
-                print("Loss2 {}".format(loss2))
-                print("Loss {}".format(loss))
+            if iteration == self.max_iterations - 1:
+            # if iteration % 1000 == 0:
+                log.debug("Iteration {}".format(iteration))
+                log.debug("Time in Iteration {}".format(time.time() - start_time))
+                log.debug("Loss1 List {}".format(loss1list))
+                log.debug("Loss2 {}".format(loss2))
+                log.debug("Loss {}".format(loss))
+                log.debug("Best Loss {}".format(best_loss))
 
-            scores = np.array(scores).reshape(self.batch_size, self.num_models, self.num_labels)
-
+            # scores = np.array(scores).reshape(self.batch_size, self.num_models, self.num_labels)
+            outer_break = False
             for e, im in enumerate(nimg):
-                if loss < best_score[e]:  # we've found a clear improvement for this attack
-                    best_score[e] = loss
-                    best_attack[e] = ii
+                if loss[e] < best_loss[e] and loss2[e] == 0:  # we've found a clear improvement for this attack
+                    best_loss[e] = loss[e]
+                    best_attack[e] = im
+                if best_loss[0] == 0.0:  # TODO only works for batch sizes of 1
+                    outer_break = True
+            if outer_break:
+                break
 
         # return the best solution found
-        # t_img = self.sess.run([self.timg], feed_dict={K.learning_phase(): 0})[0]
-        return np.array(best_attack) - batch[0] # used to be t_img
+        return np.array(best_attack) - imgs
+
 
 
 def gradientDescentFunc(distribution, models, x, y, alpha, attack=None, target=None):
