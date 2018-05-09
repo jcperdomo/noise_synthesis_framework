@@ -2,13 +2,13 @@
 
 EXP_TYPE="mnist"
 NOISE_TYPE="untargeted"
-NUM_CLASSIFIERS=3
+NUM_CLASSIFIERS=5
 DATA_PATH='dl_experiments_data/mnist'
 MODEL_PATH='mnist_dl_models'
 MWU_ITERS=1
 ALPHA=3.0
-OPT_ITERS=10000
-LR=.001
+OPT_ITERS=5000
+LR=.01
 LOG_LEVEL="DEBUG"
 PURPOSE='test'
 

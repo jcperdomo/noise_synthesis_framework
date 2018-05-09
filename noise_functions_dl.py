@@ -64,8 +64,8 @@ class GradientDescentDL:
         # the resulting image, clipped to keep bounded from boxmin to boxmax
         self.boxmul = (self.box_max - self.box_min) / 2.
         self.boxplus = (self.box_min + self.box_max) / 2.
-        self.newimg = tf.tanh(modifier + self.timg) * self.boxmul + self.boxplus
-        # self.newimg = tf.clip_by_value(self.modifier + self.timg, self.box_min, self.box_max)
+        # self.newimg = tf.tanh(modifier + self.timg) * self.boxmul + self.boxplus
+        self.newimg = tf.clip_by_value(modifier + self.timg, self.box_min, self.box_max)
 
         self.outputs = [model(self.newimg) for model in models]
         
@@ -97,14 +97,14 @@ class GradientDescentDL:
 
         # distance to the input data
         self.l2dist = tf.reduce_sum(tf.square(self.newimg - self.timg), [1, 2, 3])
-        self.loss2 = tf.maximum(0.0, self.l2dist - self.alpha ** 2)
+        # self.loss2 = tf.maximum(0.0, self.l2dist - self.alpha ** 2)
 
-        self.loss = self.loss1 + self.loss2
+        self.loss = self.loss1  # + self.loss2
 
         # Setup the adam optimizer and keep track of variables we're creating
         start_vars = set(x.name for x in tf.global_variables())
-        optimizer = tf.train.AdamOptimizer(self.learning_rate)
-        # optimizer = VariableClippingOptimizer(adam, {self.modifier: [1, 2, 3]}, self.alpha)
+        adam = tf.train.AdamOptimizer(self.learning_rate)
+        optimizer = VariableClippingOptimizer(adam, {modifier: [1, 2, 3]}, self.alpha)
         self.train = optimizer.minimize(self.loss, var_list=[modifier])
 
         end_vars = tf.global_variables()
@@ -156,7 +156,7 @@ class GradientDescentDL:
             # perform the attack
             self.sess.run([self.train], feed_dict={K.learning_phase(): 0})
 
-            nimg, loss1list, loss2, loss = self.sess.run([self.newimg, self.loss1list, self.loss2, self.loss],
+            nimg, loss1list, l2dist, loss = self.sess.run([self.newimg, self.loss1list, self.l2dist, self.loss],
                                                          feed_dict={K.learning_phase(): 0})
 
             if iteration == self.max_iterations - 1:
@@ -164,14 +164,14 @@ class GradientDescentDL:
                 log.debug("Iteration {}".format(iteration))
                 log.debug("Time in Iteration {}".format(time.time() - start_time))
                 log.debug("Loss1 List {}".format(loss1list))
-                log.debug("Loss2 {}".format(loss2))
+                log.debug("L2dist {}".format(l2dist))
                 log.debug("Loss {}".format(loss))
                 log.debug("Best Loss {}".format(best_loss))
 
             # scores = np.array(scores).reshape(self.batch_size, self.num_models, self.num_labels)
             outer_break = False
             for e, im in enumerate(nimg):
-                if loss[e] < best_loss[e] and loss2[e] == 0:  # we've found a clear improvement for this attack
+                if loss[e] < best_loss[e]: #and loss2[e] == 0:  # we've found a clear improvement for this attack
                     best_loss[e] = loss[e]
                     best_attack[e] = im
                 if best_loss[0] == 0.0:  # TODO only works for batch sizes of 1
@@ -181,7 +181,6 @@ class GradientDescentDL:
 
         # return the best solution found
         return np.array(best_attack) - imgs
-
 
 
 def gradientDescentFunc(distribution, models, x, y, alpha, attack=None, target=None):

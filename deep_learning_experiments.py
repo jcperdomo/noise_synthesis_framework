@@ -3,7 +3,6 @@ import argparse
 from mwu import run_mwu
 import sys
 import datetime
-from setup_mnist import *
 from functools import partial
 import numpy as np
 import tensorflow as tf
@@ -47,9 +46,10 @@ def main(arguments):
 
     log_file = exp_name + ".log"
     log_level = log.DEBUG if args.log_level == 'DEBUG' else log.INFO
-    log.basicConfig(format='%(asctime)s: %(message)s', level=log_level, datefmt='%m/%d/%Y %I:%M:%S %p')
-    file_handler = log.FileHandler(exp_dir + "/" + log_file)
-    log.getLogger().addHandler(file_handler)
+    log.basicConfig(format='%(asctime)s: %(message)s', level=log_level, datefmt='%m/%d/%Y %I:%M:%S %p',
+                    filename=exp_dir + "/" + log_file, filemode='w')
+    # file_handler = log.FileHandler(exp_dir + "/" + log_file)
+    # log.getLogger().addHandler(file_handler)
 
     log.info("Experiment Type {}".format(args.exp_type))
     log.info("Noise Type {}".format(args.noise_type))
@@ -96,8 +96,8 @@ def main(arguments):
 
         log.debug("finished loading models!\n")
 
-        X_exp = np.load(args.data_path + "/" + "X_exp.npy")[:1]
-        Y_exp = np.load(args.data_path + "/" + "Y_exp.npy")[:1]
+        X_exp = np.load(args.data_path + "/" + "X_exp.npy")
+        Y_exp = np.load(args.data_path + "/" + "Y_exp.npy")
         # Target_exp = np.load(data_path + "/" + "Target_exp.npy")
 
         log.info("Num Points {}".format(X_exp.shape[0]))
