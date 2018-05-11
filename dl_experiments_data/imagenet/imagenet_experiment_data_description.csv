@@ -1,0 +1,101 @@
+name,true_label,true_label_description,target_label,target_label_description
+ILSVRC2012_val_00012589.JPEG,505,coffeepot,230.0,"Shetland sheepdog, Shetland sheep dog, Shetland"
+ILSVRC2012_val_00009302.JPEG,595,"harvester, reaper",83.0,"prairie chicken, prairie grouse, prairie fowl"
+ILSVRC2012_val_00030794.JPEG,989,"hip, rose hip, rosehip",832.0,"stupa, tope"
+ILSVRC2012_val_00005030.JPEG,146,"albatross, mollymawk",707.0,"pay-phone, pay-station"
+ILSVRC2012_val_00049345.JPEG,294,"brown bear, bruin, Ursus arctos",323.0,"monarch, monarch butterfly, milkweed butterfly, Danaus plexippus"
+ILSVRC2012_val_00028723.JPEG,566,"French horn, horn",551.0,face powder
+ILSVRC2012_val_00011787.JPEG,81,ptarmigan,800.0,"slot, one-armed bandit"
+ILSVRC2012_val_00043640.JPEG,537,"dogsled, dog sled, dog sleigh",989.0,"hip, rose hip, rosehip"
+ILSVRC2012_val_00045502.JPEG,5,"electric ray, crampfish, numbfish, torpedo",825.0,stone wall
+ILSVRC2012_val_00003028.JPEG,454,"bookshop, bookstore, bookstall",434.0,bath towel
+ILSVRC2012_val_00023085.JPEG,52,"thunder snake, worm snake, Carphophis amoenus",667.0,mortarboard
+ILSVRC2012_val_00030285.JPEG,178,Weimaraner,478.0,carton
+ILSVRC2012_val_00005975.JPEG,104,"wallaby, brush kangaroo",845.0,syringe
+ILSVRC2012_val_00021619.JPEG,448,birdhouse,726.0,"plane, carpenter's plane, woodworking plane"
+ILSVRC2012_val_00010669.JPEG,34,"leatherback turtle, leatherback, leathery turtle, Dermochelys coriacea",865.0,toyshop
+ILSVRC2012_val_00049443.JPEG,393,anemone fish,553.0,"file, file cabinet, filing cabinet"
+ILSVRC2012_val_00011237.JPEG,92,bee eater,267.0,standard poodle
+ILSVRC2012_val_00038169.JPEG,87,"African grey, African gray, Psittacus erithacus",546.0,electric guitar
+ILSVRC2012_val_00003421.JPEG,69,trilobite,988.0,acorn
+ILSVRC2012_val_00001586.JPEG,138,bustard,526.0,desk
+ILSVRC2012_val_00019946.JPEG,326,"lycaenid, lycaenid butterfly",715.0,pickelhaube
+ILSVRC2012_val_00046019.JPEG,495,"china cabinet, china closet",574.0,golf ball
+ILSVRC2012_val_00033683.JPEG,179,"Staffordshire bullterrier, Staffordshire bull terrier",968.0,cup
+ILSVRC2012_val_00007598.JPEG,533,"dishrag, dishcloth",483.0,castle
+ILSVRC2012_val_00003511.JPEG,370,"guenon, guenon monkey",107.0,jellyfish
+ILSVRC2012_val_00005177.JPEG,954,banana,239.0,Bernese mountain dog
+ILSVRC2012_val_00024642.JPEG,254,"pug, pug-dog",150.0,sea lion
+ILSVRC2012_val_00025417.JPEG,645,maypole,374.0,langur
+ILSVRC2012_val_00041384.JPEG,229,"Old English sheepdog, bobtail",399.0,abaya
+ILSVRC2012_val_00010563.JPEG,197,giant schnauzer,397.0,"puffer, pufferfish, blowfish, globefish"
+ILSVRC2012_val_00002692.JPEG,346,"water buffalo, water ox, Asiatic buffalo, Bubalus bubalis",768.0,rugby ball
+ILSVRC2012_val_00047474.JPEG,16,bulbul,265.0,toy poodle
+ILSVRC2012_val_00046903.JPEG,97,drake,624.0,library
+ILSVRC2012_val_00029004.JPEG,410,"apiary, bee house",441.0,beer glass
+ILSVRC2012_val_00028137.JPEG,458,"brass, memorial tablet, plaque",338.0,"guinea pig, Cavia cobaya"
+ILSVRC2012_val_00042774.JPEG,126,isopod,704.0,parking meter
+ILSVRC2012_val_00036830.JPEG,496,Christmas stocking,616.0,knot
+ILSVRC2012_val_00047125.JPEG,162,beagle,597.0,holster
+ILSVRC2012_val_00031830.JPEG,990,"buckeye, horse chestnut, conker",515.0,"cowboy hat, ten-gallon hat"
+ILSVRC2012_val_00025441.JPEG,34,"leatherback turtle, leatherback, leathery turtle, Dermochelys coriacea",407.0,ambulance
+ILSVRC2012_val_00021206.JPEG,184,Irish terrier,862.0,torch
+ILSVRC2012_val_00000475.JPEG,888,viaduct,904.0,window screen
+ILSVRC2012_val_00005445.JPEG,540,"drilling platform, offshore rig",965.0,burrito
+ILSVRC2012_val_00033046.JPEG,679,necklace,971.0,bubble
+ILSVRC2012_val_00003062.JPEG,492,chest,794.0,shower curtain
+ILSVRC2012_val_00012741.JPEG,141,"redshank, Tringa totanus",883.0,vase
+ILSVRC2012_val_00032408.JPEG,472,canoe,691.0,oxygen mask
+ILSVRC2012_val_00027836.JPEG,340,zebra,410.0,"apiary, bee house"
+ILSVRC2012_val_00031789.JPEG,665,moped,813.0,spatula
+ILSVRC2012_val_00039804.JPEG,326,"lycaenid, lycaenid butterfly",307.0,weevil
+ILSVRC2012_val_00043991.JPEG,945,bell pepper,606.0,"iron, smoothing iron"
+ILSVRC2012_val_00015482.JPEG,355,llama,534.0,"dishwasher, dish washer, dishwashing machine"
+ILSVRC2012_val_00029831.JPEG,235,"German shepherd, German shepherd dog, German police dog, alsatian",604.0,hourglass
+ILSVRC2012_val_00045445.JPEG,346,"water buffalo, water ox, Asiatic buffalo, Bubalus bubalis",770.0,running shoe
+ILSVRC2012_val_00017169.JPEG,321,admiral,529.0,"diaper, nappy, napkin"
+ILSVRC2012_val_00028785.JPEG,900,water tower,999.0,"toilet tissue, toilet paper, bathroom tissue"
+ILSVRC2012_val_00020946.JPEG,537,"dogsled, dog sled, dog sleigh",88.0,macaw
+ILSVRC2012_val_00036060.JPEG,985,daisy,120.0,fiddler crab
+ILSVRC2012_val_00006732.JPEG,597,holster,302.0,"ground beetle, carabid beetle"
+ILSVRC2012_val_00028925.JPEG,371,"patas, hussar monkey, Erythrocebus patas",92.0,bee eater
+ILSVRC2012_val_00002937.JPEG,462,broom,95.0,jacamar
+ILSVRC2012_val_00010818.JPEG,446,"binder, ring-binder",295.0,"American black bear, black bear, Ursus americanus, Euarctos americanus"
+ILSVRC2012_val_00005327.JPEG,245,French bulldog,21.0,kite
+ILSVRC2012_val_00044985.JPEG,871,trimaran,193.0,Australian terrier
+ILSVRC2012_val_00009259.JPEG,937,broccoli,333.0,hamster
+ILSVRC2012_val_00035451.JPEG,72,"black and gold garden spider, Argiope aurantia",222.0,kuvasz
+ILSVRC2012_val_00024304.JPEG,745,projector,493.0,"chiffonier, commode"
+ILSVRC2012_val_00004963.JPEG,243,bull mastiff,774.0,sandal
+ILSVRC2012_val_00019392.JPEG,637,"mailbox, letter box",579.0,"grand piano, grand"
+ILSVRC2012_val_00036042.JPEG,13,"junco, snowbird",390.0,eel
+ILSVRC2012_val_00028813.JPEG,63,"Indian cobra, Naja naja",966.0,red wine
+ILSVRC2012_val_00040055.JPEG,206,curly-coated retriever,308.0,fly
+ILSVRC2012_val_00000007.JPEG,334,"porcupine, hedgehog",405.0,"airship, dirigible"
+ILSVRC2012_val_00000011.JPEG,109,brain coral,407.0,ambulance
+ILSVRC2012_val_00000012.JPEG,286,"cougar, puma, catamount, mountain lion, painter, panther, Felis concolor",406.0,altar
+ILSVRC2012_val_00000013.JPEG,370,"guenon, guenon monkey",411.0,apron
+ILSVRC2012_val_00000014.JPEG,757,"recreational vehicle, RV, R.V.",700.0,paper towel
+ILSVRC2012_val_00000015.JPEG,595,"harvester, reaper",711.0,"perfume, essence"
+ILSVRC2012_val_00000016.JPEG,147,"grey whale, gray whale, devilfish, Eschrichtius gibbosus, Eschrichtius robustus",924.0,guacamole
+ILSVRC2012_val_00000019.JPEG,478,carton,162.0,beagle
+ILSVRC2012_val_00000020.JPEG,517,crane,518.0,crash helmet
+ILSVRC2012_val_00000023.JPEG,948,Granny Smith,312.0,admiral
+ILSVRC2012_val_00000024.JPEG,727,planetarium,496.0,Christmas stocking
+ILSVRC2012_val_00000025.JPEG,23,vulture,526.0,desk
+ILSVRC2012_val_00000027.JPEG,270,"white wolf, Arctic wolf, Canis lupus tundrarum",507.0,combination lock
+ILSVRC2012_val_00000029.JPEG,55,"green snake, grass snake",417.0,balloon
+ILSVRC2012_val_00000031.JPEG,324,cabbage butterfly,344.0,"hippopotamus, hippo, river horse, Hippopotamus amphibius"
+ILSVRC2012_val_00000035.JPEG,586,half track,319.0,"dragonfly, darning needle, devil's darning needle, sewing needle, snake feeder, snake doctor, mosquito hawk, skeeter hawk"
+ILSVRC2012_val_00000036.JPEG,887,vestment,783.0,screwdriver
+ILSVRC2012_val_00000038.JPEG,398,abacus,287.0,"lynx, catamount"
+ILSVRC2012_val_00000040.JPEG,74,"garden spider, Aranea diademata",778.0,"scale, weighing machine"
+ILSVRC2012_val_00000042.JPEG,756,rain barrel,270.0,"white wolf, Arctic wolf, Canis lupus tundrarum"
+ILSVRC2012_val_00000043.JPEG,129,spoonbill,536.0,"dock, dockage, docking facility"
+ILSVRC2012_val_00000045.JPEG,256,"Newfoundland, Newfoundland dog",772.0,safety pin
+ILSVRC2012_val_00000047.JPEG,565,freight car,309.0,bee
+ILSVRC2012_val_00000052.JPEG,29,"axolotl, mud puppy, Ambystoma mexicanum",414.0,"backpack, back pack, knapsack, packsack, rucksack, haversack"
+ILSVRC2012_val_00031598.JPEG,31,"tree frog, tree-frog",,
+ILSVRC2012_val_00033013.JPEG,812,space shuttle,,
+ILSVRC2012_val_00017040.JPEG,866,tractor,,
+ILSVRC2012_val_00009582.JPEG,995,earthstar,,
