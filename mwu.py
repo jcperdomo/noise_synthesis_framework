@@ -46,7 +46,11 @@ def adversary(distribution, models, X, Y, alpha, noise_func, targets, use_ray=Tr
 
 def run_mwu(models, iters, X, Y, alpha, noise_func, epsilon=None, targeted=False, dl=False, use_ray=True):
 
-    ray.init()
+    if dl:
+        ray.init(num_gpus=4)
+    else:
+        ray.init()
+
 
     num_models = len(models)
 
