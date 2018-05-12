@@ -161,12 +161,12 @@ class GradientDescentDL:
 
             if iteration == self.max_iterations - 1:
             # if iteration % 1000 == 0:
-                log.debug("Iteration {}".format(iteration))
+            #     log.debug("Iteration {}".format(iteration))
                 log.debug("Time in Iteration {}".format(time.time() - start_time))
-                log.debug("Loss1 List {}".format(loss1list))
+            #     log.debug("Loss1 List {}".format(loss1list))
                 log.debug("L2dist {}".format(l2dist))
-                log.debug("Loss {}".format(loss))
-                log.debug("Best Loss {}".format(best_loss))
+                # log.debug("Loss {}".format(loss))
+                # log.debug("Best Loss {}".format(best_loss))
 
             # scores = np.array(scores).reshape(self.batch_size, self.num_models, self.num_labels)
             outer_break = False

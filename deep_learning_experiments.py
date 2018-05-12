@@ -99,8 +99,8 @@ def main(arguments):
 
         log.debug("finished loading models!\n")
 
-        X_exp = np.load(args.data_path + "/" + "X_exp.npy")
-        Y_exp = np.load(args.data_path + "/" + "Y_exp.npy")
+        X_exp = np.load(args.data_path + "/" + "X_exp.npy")[:100]
+        Y_exp = np.load(args.data_path + "/" + "Y_exp.npy")[:100]
         # Target_exp = np.load(data_path + "/" + "Target_exp.npy")
 
         log.info("Num Points {}".format(X_exp.shape[0]))
