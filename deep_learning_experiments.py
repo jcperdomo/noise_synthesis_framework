@@ -16,7 +16,7 @@ from keras.layers.core import Lambda
 from keras.layers import Input
 from keras.applications.imagenet_utils import preprocess_input
 from keras.models import Model
-from noise_functions_dl import GradientDescentDL, gradientDescentFunc
+from noise_functions_dl import GradientDescentDL
 from mnist_dl_models import load_model
 import ray
 
