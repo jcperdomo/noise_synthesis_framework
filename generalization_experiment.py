@@ -8,6 +8,8 @@ from noise_functions_multi import grad_desc_nonconvex
 import ray
 import os
 
+ray.init()
+
 mnist = input_data.read_data_sets("MNIST_data/", one_hot=True)
 
 mnist_train_images = np.copy(mnist.train.images)
@@ -20,22 +22,21 @@ num_models = 1000
 linear_models = []
 sparse_training_sets = []
 
-@ray.remote
 def train_model(train_set, train_labels):
-    zeroed_features = np.random.choice(range(784), 588, replace=False)
-    train_set = np.copy(train_set)
-    train_set[:, zeroed_features] = 0.0
     model = LinearSVC(loss='hinge')
     model.fit(train_set, train_labels)
     return LinearOneVsAllClassifier(10, model.coef_, model.intercept_)
 
-print("Initializing Ray")
-ray.init()
-print("Done initializing")
 
 print("Starting to train models")
-models = [train_model.remote(mnist_train_images, mnist_train_labels) for _ in xrange(num_models)]
-models = ray.get(models)
+models = []
+for i in xrange(num_models):
+    print i
+    zeroed_features = np.random.choice(range(784), 588, replace=False)
+    train_set = np.copy(mnist_train_images)
+    train_set[:, zeroed_features] = 0.0
+    models.append(train_model(train_set, mnist_train_labels))
+
 print("Done training models")
 
 exp_folder = 'generalization_experiment'
