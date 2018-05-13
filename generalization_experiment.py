@@ -23,6 +23,7 @@ sparse_training_sets = []
 @ray.remote
 def train_model(train_set, train_labels):
     zeroed_features = np.random.choice(range(784), 588, replace=False)
+    train_set = np.copy(train_set)
     train_set[:, zeroed_features] = 0.0
     model = LinearSVC(loss='hinge')
     model.fit(train_set, train_labels)
