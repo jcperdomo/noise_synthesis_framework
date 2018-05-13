@@ -28,14 +28,14 @@ def train_model(train_set, train_labels):
     model.fit(train_set, train_labels)
     return LinearOneVsAllClassifier(10, model.coef_, model.intercept_)
 
-print "Initializing Ray"
+print("Initializing Ray")
 ray.init()
-print "Done initializing"
+print("Done initializing")
 
-print "Starting to train models"
+print("Starting to train models")
 models = [train_model.remote(mnist_train_images, mnist_train_labels) for _ in xrange(num_models)]
 models = ray.get(models)
-print "Done training models"
+print("Done training models")
 
 exp_folder = 'generalization_experiment'
 os.mkdir(exp_folder)
@@ -47,13 +47,13 @@ for i, model in enumerate(models):
     np.save('{}/models/w_{}.npy'.format(exp_folder, i), model.weights)
     np.save('{}/models/b_{}.npy'.format(exp_folder, i), model.bias)
 
-print "Done Saving models"
+print("Done Saving models")
 
 num_points = 1000
 X_exp, Y_exp = generate_exp_data(num_points, mnist_test_images, mnist_test_labels, models)
 
 
-print "number of points", X_exp.shape
+print("number of points {}".format(X_exp.shape))
 
 np.save(exp_folder + '/data/X_exp.npy', X_exp)
 np.save(exp_folder + '/data/Y_exp.npy', X_exp)
@@ -63,7 +63,7 @@ mwu_iters = 50
 alpha = .5
 
 for k in subset_sizes:
-    print "Iteration ", k
+    print("Iteration {}".format(k))
     chosen_ixs = np.random.choice(range(num_models), k, replace=False)
     chosen_models = []
     for ix in chosen_ixs:
@@ -76,4 +76,4 @@ for k in subset_sizes:
     np.save(exp_folder + "/results/" + "acc_history_{}.npy".format(k), acc_history)
     np.save(exp_folder + "/results/" + "action_loss_{}.npy".format(k), action_loss)
 
-print "DONE"
+print("DONE")
