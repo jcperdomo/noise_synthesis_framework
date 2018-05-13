@@ -183,7 +183,11 @@ class GradientDescentDL:
         return np.array(best_attack) - imgs
 
 
-
-
-
+def gradientDescentFunc(distribution, models, x, y, alpha, attack=None, target=None):
+    x = np.expand_dims(x, axis=0)
+    if target is not None:
+        y = np.expand_dims(target, axis=0)
+    else:
+        y = np.expand_dims(y, axis=0)
+    return attack.attack(x, y, distribution)[0]
 

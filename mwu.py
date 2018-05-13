@@ -28,15 +28,15 @@ def adversary(distribution, models, X, Y, alpha, noise_func, targets, use_ray=Tr
     uses the noise function to compute adversarial perturbations that maximize the loss of the learner under
     the chosen distribution
     """
-    # if use_ray:
-    #     noise_func = noise_func.remote
+    if use_ray:
+        noise_func = noise_func.remote
 
     if targets is not False:
-        res = [noise_func.remote(distribution, models, x, y, alpha, target=target) for x, y, target
+        res = [noise_func(distribution, models, x, y, alpha, target=target) for x, y, target
                in zip(X, Y, targets)]
 
     else:
-        res = [noise_func.remote(distribution, models, x, y, alpha) for x, y in zip(X, Y)]
+        res = [noise_func(distribution, models, x, y, alpha) for x, y in zip(X, Y)]
 
     if use_ray:
         res = ray.get(res)
@@ -46,7 +46,7 @@ def adversary(distribution, models, X, Y, alpha, noise_func, targets, use_ray=Tr
 
 def run_mwu(models, iters, X, Y, alpha, noise_func, epsilon=None, targeted=False, dl=False, use_ray=True):
 
-    ray.init()
+    # ray.init()
 
     num_models = len(models)
 

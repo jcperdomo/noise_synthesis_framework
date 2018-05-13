@@ -16,7 +16,7 @@ from keras.layers.core import Lambda
 from keras.layers import Input
 from keras.applications.imagenet_utils import preprocess_input
 from keras.models import Model
-from noise_functions_dl import GradientDescentDL
+from noise_functions_dl import GradientDescentDL, gradientDescentFunc
 from mnist_dl_models import load_model
 import ray
 
@@ -111,15 +111,8 @@ def main(arguments):
                                        batch_size=1, max_iterations=args.opt_iters, learning_rate=args.learning_rate,
                                        confidence=0)
 
-        # noise_func = partial(gradientDescentFunc, attack=attack_obj)
-        @ray.remote(num_gpus=1)
-        def noise_func(distribution, models, x, y, alpha, attack=attack_obj, target=None):
-            x = np.expand_dims(x, axis=0)
-            if target is not None:
-                y = np.expand_dims(target, axis=0)
-            else:
-                y = np.expand_dims(y, axis=0)
-            return attack.attack(x, y, distribution)[0]
+        noise_func = partial(gradientDescentFunc, attack=attack_obj)
+
 
         # targeted = Target_exp if target_bool else False
         targeted = False
