@@ -6,6 +6,7 @@ from utils import generate_exp_data
 from mwu import run_mwu
 from noise_functions_multi import grad_desc_nonconvex
 import ray
+import time
 import os
 
 ray.init()
@@ -21,6 +22,7 @@ num_mnist_features = 784
 num_models = 1000
 linear_models = []
 sparse_training_sets = []
+
 
 def train_model(train_set, train_labels):
     model = LinearSVC(loss='hinge')
@@ -72,6 +74,7 @@ alpha = .5
 
 for k in subset_sizes:
     print("Iteration {}".format(k))
+    start = time.time()
     chosen_ixs = np.random.choice(range(num_models), k, replace=False)
     chosen_models = []
     for ix in chosen_ixs:
@@ -83,5 +86,8 @@ for k in subset_sizes:
     np.save(exp_folder + "/results/" + "loss_history_{}.npy".format(k), loss_history)
     np.save(exp_folder + "/results/" + "acc_history_{}.npy".format(k), acc_history)
     np.save(exp_folder + "/results/" + "action_loss_{}.npy".format(k), action_loss)
+
+    time_in_iter = time.time() - start
+    print("Time in iter {}".format(time_in_iter))
 
 print("DONE")
