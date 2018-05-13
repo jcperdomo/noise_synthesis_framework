@@ -28,26 +28,32 @@ def train_model(train_set, train_labels):
     return LinearOneVsAllClassifier(10, model.coef_, model.intercept_)
 
 
-print("Starting to train models")
-models = []
-for i in xrange(num_models):
-    print i
-    zeroed_features = np.random.choice(range(784), 588, replace=False)
-    train_set = np.copy(mnist_train_images)
-    train_set[:, zeroed_features] = 0.0
-    models.append(train_model(train_set, mnist_train_labels))
-
-print("Done training models")
+# print("Starting to train models")
+# models = []
+# for i in xrange(num_models):
+#     print i
+#     zeroed_features = np.random.choice(range(784), 588, replace=False)
+#     train_set = np.copy(mnist_train_images)
+#     train_set[:, zeroed_features] = 0.0
+#     models.append(train_model(train_set, mnist_train_labels))
+#
+# print("Done training models")
 
 exp_folder = 'generalization_experiment'
-os.mkdir(exp_folder)
-os.mkdir(exp_folder + '/models/')
-os.mkdir(exp_folder + '/results')
-os.mkdir(exp_folder + '/data/')
+# os.mkdir(exp_folder)
+# os.mkdir(exp_folder + '/models/')
+# os.mkdir(exp_folder + '/results')
+# os.mkdir(exp_folder + '/data/')
 
-for i, model in enumerate(models):
-    np.save('{}/models/w_{}.npy'.format(exp_folder, i), model.weights)
-    np.save('{}/models/b_{}.npy'.format(exp_folder, i), model.bias)
+# for i, model in enumerate(models):
+#     np.save('{}/models/w_{}.npy'.format(exp_folder, i), model.weights)
+#     np.save('{}/models/b_{}.npy'.format(exp_folder, i), model.bias)
+
+models = []
+for i in xrange(num_models):
+    w = np.load('{}/models/w_{}.npy'.format(exp_folder, i))
+    b = np.load('{}/models/b_{}.npy'.format(exp_folder, i))
+    models.append(LinearOneVsAllClassifier(10, w, b))
 
 print("Done Saving models")
 
@@ -58,7 +64,7 @@ X_exp, Y_exp = generate_exp_data(num_points, mnist_test_images, mnist_test_label
 print("number of points {}".format(X_exp.shape))
 
 np.save(exp_folder + '/data/X_exp.npy', X_exp)
-np.save(exp_folder + '/data/Y_exp.npy', X_exp)
+np.save(exp_folder + '/data/Y_exp.npy', Y_exp)
 
 subset_sizes = [5, 10, 25, 50, 100, 150, 250, 500, 750, 1000]
 mwu_iters = 50
