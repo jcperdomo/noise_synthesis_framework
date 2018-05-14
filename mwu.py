@@ -36,10 +36,21 @@ def adversary(distribution, models, X, Y, alpha, noise_func, targets, use_ray=Tr
                in zip(X, Y, targets)]
 
     else:
-        res = [noise_func(distribution, models, x, y, alpha) for x, y in zip(X, Y)]
+        # Start 5 tasks.
+        XY = enumerate(zip(X, Y))
+        res = []
+        for _ in xrange(20):
+            sub_res = []
+            for _ in xrange(50):
+                _, (x, y) = next(XY)
+                sub_res.append(noise_func(distribution, models, x, y, alpha))
+            sub_res = ray.get(sub_res)
+            res = res + sub_res
 
-    if use_ray:
-        res = ray.get(res)
+        # res = [noise_func(distribution, models, x, y, alpha) for x, y in zip(X, Y)]
+
+    # if use_ray:
+    #     res = ray.get(res)
 
     return np.array(res)
 

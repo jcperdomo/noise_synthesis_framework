@@ -60,15 +60,15 @@ for i in xrange(num_models):
 print("Done Saving models")
 
 num_points = 1000
-X_exp, Y_exp = generate_exp_data(num_points, mnist_test_images, mnist_test_labels, models)
+#X_exp, Y_exp = generate_exp_data(num_points, mnist_test_images, mnist_test_labels, models)
 
 
-print("number of points {}".format(X_exp.shape))
+#print("number of points {}".format(X_exp.shape))
 
-np.save(exp_folder + '/data/X_exp.npy', X_exp)
-np.save(exp_folder + '/data/Y_exp.npy', Y_exp)
+#np.save(exp_folder + '/data/X_exp.npy', X_exp)
+#np.save(exp_folder + '/data/Y_exp.npy', Y_exp)
 
-subset_sizes = [5, 10, 25, 50, 100, 150, 250, 500, 750, 1000]
+subset_sizes = [100, 250, 500, 1000]
 mwu_iters = 50
 alpha = .5
 
