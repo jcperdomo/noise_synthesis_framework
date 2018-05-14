@@ -68,6 +68,9 @@ num_points = 1000
 #np.save(exp_folder + '/data/X_exp.npy', X_exp)
 #np.save(exp_folder + '/data/Y_exp.npy', Y_exp)
 
+X_exp = np.load(exp_folder + '/data/X_exp.npy')
+Y_exp = np.load(exp_folder + '/data/Y_exp.npy')
+
 subset_sizes = [100, 250, 500, 1000]
 mwu_iters = 50
 alpha = .5
