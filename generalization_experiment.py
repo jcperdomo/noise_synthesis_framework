@@ -2,9 +2,9 @@ from tensorflow.examples.tutorials.mnist import input_data
 from sklearn.svm import LinearSVC
 import numpy as np
 from linear_models import LinearOneVsAllClassifier
-from utils import generate_exp_data
+from utils import generate_exp_data, subset_multiclass_data
 from mwu import run_mwu
-from noise_functions_multi import grad_desc_nonconvex
+from noise_functions_multi import grad_desc_convex
 import ray
 import time
 import os
@@ -18,28 +18,25 @@ mnist_train_labels = np.argmax(mnist.train.labels, axis=1)
 mnist_test_images = mnist.test.images
 mnist_test_labels = np.argmax(mnist.test.labels, axis=1)
 
-num_mnist_features = 784
-num_models = 1000
-linear_models = []
-sparse_training_sets = []
+label_dict = {0: 0, 1: 1, 2: 2, 3: 3}
+multi_train_images, multi_train_labels = subset_multiclass_data(mnist_train_images, mnist_train_labels, label_dict)
+multi_test_images, multi_test_labels = subset_multiclass_data(mnist_test_images, mnist_test_labels, label_dict)
 
-
-def train_model(train_set, train_labels):
+num_models = 50
+num_classes = 4
+mnist_num_dim = 28 * 28
+sparse_features_perc = .75
+models = []
+zeroed_features_list = []
+for i in xrange(num_models):
+    sparse_multi_images = np.copy(multi_train_images)
+    zeroed_features = np.random.randint(0, mnist_num_dim, int(sparse_features_perc * mnist_num_dim))
+    zeroed_features_list.append(zeroed_features)
+    sparse_multi_images[:, zeroed_features] = 0.0
     model = LinearSVC(loss='hinge')
-    model.fit(train_set, train_labels)
-    return LinearOneVsAllClassifier(10, model.coef_, model.intercept_)
-
-
-# print("Starting to train models")
-# models = []
-# for i in xrange(num_models):
-#     print i
-#     zeroed_features = np.random.choice(range(784), 588, replace=False)
-#     train_set = np.copy(mnist_train_images)
-#     train_set[:, zeroed_features] = 0.0
-#     models.append(train_model(train_set, mnist_train_labels))
-#
-# print("Done training models")
+    model.fit(sparse_multi_images, multi_train_labels)
+    model = LinearOneVsAllClassifier(num_classes, model.coef_, model.intercept_)
+    models.append(model)
 
 exp_folder = 'generalization_experiment'
 # os.mkdir(exp_folder)
@@ -47,33 +44,33 @@ exp_folder = 'generalization_experiment'
 # os.mkdir(exp_folder + '/results')
 # os.mkdir(exp_folder + '/data/')
 
-# for i, model in enumerate(models):
-#     np.save('{}/models/w_{}.npy'.format(exp_folder, i), model.weights)
-#     np.save('{}/models/b_{}.npy'.format(exp_folder, i), model.bias)
+for i, model in enumerate(models):
+    np.save('{}/models/w_{}.npy'.format(exp_folder, i), model.weights)
+    np.save('{}/models/b_{}.npy'.format(exp_folder, i), model.bias)
 
-models = []
-for i in xrange(num_models):
-    w = np.load('{}/models/w_{}.npy'.format(exp_folder, i))
-    b = np.load('{}/models/b_{}.npy'.format(exp_folder, i))
-    models.append(LinearOneVsAllClassifier(10, w, b))
+# models = []
+# for i in xrange(num_models):
+#     w = np.load('{}/models/w_{}.npy'.format(exp_folder, i))
+#     b = np.load('{}/models/b_{}.npy'.format(exp_folder, i))
+#     models.append(LinearOneVsAllClassifier(10, w, b))
 
 print("Done Saving models")
 
 num_points = 1000
-#X_exp, Y_exp = generate_exp_data(num_points, mnist_test_images, mnist_test_labels, models)
+X_exp, Y_exp = generate_exp_data(num_points, mnist_test_images, mnist_test_labels, models)
 
 
-#print("number of points {}".format(X_exp.shape))
+print("number of points {}".format(X_exp.shape))
 
-#np.save(exp_folder + '/data/X_exp.npy', X_exp)
-#np.save(exp_folder + '/data/Y_exp.npy', Y_exp)
+np.save(exp_folder + '/data/X_exp.npy', X_exp)
+np.save(exp_folder + '/data/Y_exp.npy', Y_exp)
 
-X_exp = np.load(exp_folder + '/data/X_exp.npy')
-Y_exp = np.load(exp_folder + '/data/Y_exp.npy')
+# X_exp = np.load(exp_folder + '/data/X_exp.npy')
+# Y_exp = np.load(exp_folder + '/data/Y_exp.npy')
 
-subset_sizes = [100, 250, 500, 1000]
-mwu_iters = 50
-alpha = .5
+subset_sizes = [1, 5, 10, 20, 30, 40, 50]
+mwu_iters = 10
+alpha = .8
 
 for k in subset_sizes:
     print("Iteration {}".format(k))
@@ -82,8 +79,10 @@ for k in subset_sizes:
     chosen_models = []
     for ix in chosen_ixs:
         chosen_models.append(models[ix])
+
     weights, noise, loss_history, acc_history, action_loss = run_mwu(chosen_models, mwu_iters, X_exp, Y_exp, alpha,
-                                                                     grad_desc_nonconvex)
+                                                                     grad_desc_convex)
+
     np.save(exp_folder + "/results/" + "weights_{}.npy".format(k), weights)
     np.save(exp_folder + "/results/" + "noise_{}.npy".format(k), noise)
     np.save(exp_folder + "/results/" + "loss_history_{}.npy".format(k), loss_history)
