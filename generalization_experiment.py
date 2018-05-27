@@ -39,20 +39,20 @@ for i in xrange(num_models):
     models.append(model)
 
 exp_folder = 'generalization_experiment'
-# os.mkdir(exp_folder)
-# os.mkdir(exp_folder + '/models/')
-# os.mkdir(exp_folder + '/results')
-# os.mkdir(exp_folder + '/data/')
+os.mkdir(exp_folder)
+os.mkdir(exp_folder + '/models/')
+os.mkdir(exp_folder + '/results')
+os.mkdir(exp_folder + '/data/')
 
 for i, model in enumerate(models):
     np.save('{}/models/w_{}.npy'.format(exp_folder, i), model.weights)
     np.save('{}/models/b_{}.npy'.format(exp_folder, i), model.bias)
 
-# models = []
-# for i in xrange(num_models):
-#     w = np.load('{}/models/w_{}.npy'.format(exp_folder, i))
-#     b = np.load('{}/models/b_{}.npy'.format(exp_folder, i))
-#     models.append(LinearOneVsAllClassifier(10, w, b))
+models = []
+for i in xrange(num_models):
+    w = np.load('{}/models/w_{}.npy'.format(exp_folder, i))
+    b = np.load('{}/models/b_{}.npy'.format(exp_folder, i))
+    models.append(LinearOneVsAllClassifier(10, w, b))
 
 print("Done Saving models")
 

@@ -2,7 +2,7 @@
 ## This program is licenced under the BSD 2-Clause licence,
 ## contained in the LICENCE file in this directory.
 
-## Modified by Juan C. Perdomo 2017
+## Modified by Juan C. Perdomo 2018
 
 import tensorflow as tf
 from tensorflow.contrib.opt import VariableClippingOptimizer

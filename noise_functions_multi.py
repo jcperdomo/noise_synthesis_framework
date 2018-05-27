@@ -1,9 +1,7 @@
 import numpy as np
 from cvxopt import matrix, solvers
 from itertools import product
-from functools import partial
 import sys
-import time
 import ray
 
 

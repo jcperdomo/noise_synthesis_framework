@@ -18,7 +18,6 @@ from keras.applications.imagenet_utils import preprocess_input
 from keras.models import Model
 from noise_functions_dl import GradientDescentDL, gradientDescentFunc
 from mnist_dl_models import load_model
-import ray
 
 
 def main(arguments):
@@ -113,8 +112,6 @@ def main(arguments):
 
         noise_func = partial(gradientDescentFunc, attack=attack_obj)
 
-
-        # targeted = Target_exp if target_bool else False
         targeted = False
         weights, noise, loss_history, acc_history, action_loss = run_mwu(models, args.mwu_iters, X_exp, Y_exp,
                                                                          args.alpha, noise_func, targeted=targeted,
