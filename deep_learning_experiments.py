@@ -101,6 +101,7 @@ def main(arguments):
 
             if args.holdout is not None:
                 del models[args.holdout]
+                print "ASDASDASDASDAS Length of Models ", len(models)
 
             for model in models:
                 model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
