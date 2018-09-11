@@ -99,15 +99,14 @@ def main(arguments):
 
             models = [inception, xception, resnet, densenet, vgg]
 
-            if args.holdout is not None:
-                del models[args.holdout]
-                print "ASDASDASDASDAS Length of Models ", len(models)
-
             for model in models:
                 model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
 
             dataset_params = [224, 3, 1000, (0.0, 255.0)]
 
+        if args.holdout is not None:
+            del models[args.holdout]
+            print "ASDASDASDASDAS Length of Models {}".format(len(models))
 
 
         log.debug("finished loading models!\n")
