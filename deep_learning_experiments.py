@@ -7,6 +7,7 @@ from functools import partial
 import numpy as np
 import tensorflow as tf
 import os
+import ray
 from keras.applications.resnet50 import ResNet50
 from keras.applications.densenet import DenseNet121
 from keras.applications.xception import Xception
@@ -98,13 +99,15 @@ def main(arguments):
 
             models = [inception, xception, resnet, densenet, vgg]
 
+            if args.holdout is not None:
+                del models[args.holdout]
+
             for model in models:
                 model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
 
             dataset_params = [224, 3, 1000, (0.0, 255.0)]
 
-        if args.holdout is not None:
-            del models[args.holdout]
+
 
         log.debug("finished loading models!\n")
 
@@ -118,7 +121,7 @@ def main(arguments):
         attack_obj = GradientDescentDL(sess, models, args.alpha, dataset_params, targeted=target_bool,
                                        batch_size=1, max_iterations=args.opt_iters, learning_rate=args.learning_rate,
                                        confidence=0)
-        #@ray.remote
+
         noise_func = partial(gradientDescentFunc, attack=attack_obj)
 
         targeted = False
