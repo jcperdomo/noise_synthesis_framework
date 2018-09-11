@@ -58,6 +58,8 @@ def run_mwu(models, iters, X, Y, alpha, noise_func, epsilon=None, targeted=False
     else:
         delta = 2.0 * epsilon
 
+    epsilon = max([.99, epsilon])
+
     log.info("\nRunning MWU for {} Iterations with Epsilon {}\n".format(iters, epsilon))
     log.info("Guaranteed to be within {} of the minimax value \n".format(delta))
 
